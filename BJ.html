@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <title>BlackJack v1</title>
+    <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="dealer-area">
+        <span id="dealerSum">0</span>
+        <div class="card-box" id="dealerCards">
+            <!--            <div class=" card cover-card"></div>-->
+
+        </div><!-- card-box -->
+    </div><!-- dealer-area -->
+
+    <div class="status-box" id="statusBox">
+        <div id="showMsg"></div>
+        <span class="again-btn" onclick="playAgain();">Еще разок</span>
+    </div><!-- status-box -->
+
+    <div class="player-area">
+        <span id="playerSum">0</span>
+        <div class="card-box" id="playerCards">
+        </div><!-- card-box -->
+        <div class="button-box">
+            <button id="moreBtn" onclick="getPlayerCard();" class="btn">Карту</button>
+            <button id="enoughBtn" onclick="enough();" class="btn">Хватит</button>
+        </div><!-- button-box -->
+    </div><!-- player-area -->
+
+</body>
+
+</html>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+        background: #104310;
+        font-family: 'Raleway', sans-serif;
+
+    }
+
+
+    .status-box {
+        height: 100px;
+        width: 250px;
+        background: rgba(255, 255, 255, 0.35);
+        position: absolute;
+        top: 40%;
+        left: 40%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: .5s;
+        color: white;
+    }
+
+
+
+    .again-btn {
+        margin-top: 15px;
+        padding: 5px 10px;
+        background: green;
+        cursor: pointer;
+    }
+
+    .again-btn:hover {
+        background: #0e760e;
+    }
+
+    .again-btn:active {
+        background: #026a02;
+    }
+
+    .dealer-area,
+    .player-area {
+        height: 300px;
+        width: 500px;
+        display: flex;
+        flex-direction: column;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .dealer-area span,
+    .player-area span {
+        font-size: 32px;
+        color: white;
+        text-align: center;
+        margin-top: 15px;
+    }
+
+    .card-box {
+        display: flex;
+        height: 150px;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+
+    }
+
+    .card {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 130px;
+        width: 90px;
+        background: rgba(255, 255, 255, 0.78);
+        margin: 5px;
+        position: relative;
+        font-size: 32px
+    }
+
+    .cover-card {
+        background:
+            radial-gradient(ellipse farthest-corner, transparent 0%, transparent 35%, white 30%, white 40%, transparent 90%),
+            radial-gradient(ellipse farthest-corner at 0 0, transparent 0%, transparent 20%, white 15%, white 20%, transparent 50%),
+            radial-gradient(ellipse farthest-corner at 8px 8px, transparent 0%, transparent 20%, white 15%, white 20%, transparent 50%), radial-gradient(ellipse farthest-corner at 0 8px, transparent 0%, transparent 20%, white 15%, white 20%, transparent 40%), radial-gradient(ellipse farthest-corner at 8px 0, transparent 0%, transparent 20%, white 15%, white 20%, transparent 50%), linear-gradient(40deg, #AC394A 0%, #DC625F 30%, #EB7D5C 50%, #DC625F 70%, #AC394A 100%);
+        background-size: 8px 8px, 8px 8px, 8px 8px, 8px 8px, 8px 8px, 100% 100%;
+    }
+
+    .hearts:before {
+        position: absolute;
+        content: "♥";
+        color: red;
+        font-size: 40px;
+        top: -5px;
+        left: 5px;
+    }
+
+    .hearts:after {
+        position: absolute;
+        content: "♥";
+        color: red;
+        font-size: 40px;
+        bottom: -5px;
+        right: 5px;
+        transform: rotate(180deg);
+    }
+
+
+    .diamonds:before {
+        position: absolute;
+        content: "♦";
+        color: red;
+        font-size: 40px;
+        top: -5px;
+        left: 5px;
+    }
+
+    .diamonds:after {
+        position: absolute;
+        content: "♦";
+        color: red;
+        font-size: 40px;
+        bottom: -5px;
+        right: 5px;
+        transform: rotate(180deg);
+    }
+
+    .spades:before {
+        position: absolute;
+        content: "♠";
+        color: black;
+        font-size: 40px;
+        top: -5px;
+        left: 5px;
+    }
+
+    .spades:after {
+        position: absolute;
+        content: "♠";
+        color: black;
+        font-size: 40px;
+        bottom: -5px;
+        right: 5px;
+        transform: rotate(180deg);
+    }
+
+    .clubs:before {
+        position: absolute;
+        content: "♣";
+        color: black;
+        font-size: 40px;
+        top: -5px;
+        left: 5px;
+    }
+
+    .clubs:after {
+        position: absolute;
+        content: "♣";
+        color: black;
+        font-size: 40px;
+        bottom: -5px;
+        right: 5px;
+        transform: rotate(180deg);
+    }
+
+    .spades,
+    .clubs {
+        color: black;
+    }
+
+    .hearts,
+    .diamonds {
+        color: red;
+    }
+
+    .button-box {
+        display: flex;
+        justify-content: center;
+    }
+
+    .btn {
+        padding: 5px 15px;
+        margin: 5px;
+        min-width: 90px;
+        cursor: pointer;
+    }
+
+</style>
+
+<script>
+    let deck = [];
+    var currentCard = 0;
+    let dealerSum = 0;
+    let playerSum = 0;
+    let suit;
+    let titleCard;
+    let dealerCards = [];
+    let playerCards = [];
+    let pCurrentCard = 0;
+    let dCurrentCard = 0;
+    let acesD = 0;
+    let acesP = 0;
+    let acesPcount = 0;
+    let acesDcount = 0;
+
+
+    function shuffleDeck() {
+        for (let suits = 0; suits < 4; suits++) {
+            for (let i = 1; i < 13; i++) {
+                let cost = i;
+                if (i > 9) {
+                    cost = 10;
+                }
+                if (i == 1) {
+                    cost = 11;
+                }
+                deck.push({
+                    name: i.toString(16),
+                    suits: suits,
+                    cost: cost
+                });
+            }
+        }
+
+        deck.sort(() => Math.random() - 0.5);
+    }
+
+    function checkSuit() {
+        if (deck[currentCard].suits == 0) {
+            suit = '<div class="card hearts">';
+        }
+
+        if (deck[currentCard].suits == 1) {
+            suit = '<div class="card clubs">';
+        }
+
+        if (deck[currentCard].suits == 2) {
+            suit = '<div class="card spades">';
+        }
+
+        if (deck[currentCard].suits == 3) {
+            suit = '<div class="card diamonds">';
+        }
+    }
+
+    function checkName() {
+
+        if (deck[currentCard].name == "1" || deck[currentCard].cost == "11" || deck[currentCard].name == "11") {
+            titleCard = 'A';
+        } else
+
+        if (deck[currentCard].name == 'a') {
+            titleCard = 'J';
+        } else
+
+        if (deck[currentCard].name == 'b') {
+            titleCard = 'Q';
+        } else
+
+        if (deck[currentCard].name == 'c') {
+            titleCard = 'K';
+        } else {
+            titleCard = deck[currentCard].cost;
+        }
+    }
+
+    function drawDealerSum() {
+        dealerSumShow = document.getElementById('dealerSum').innerHTML = dealerSum;
+
+        if (dealerSum > 21) {
+            document.getElementById('dealerSum').innerHTML = 'Перебор';
+        }
+    }
+
+    function drawDealerCard() {
+        dealerHand = document.getElementById('dealerCards');
+        dealerHand.innerHTML += suit + titleCard + '</div>';
+
+    }
+
+    function drawPlayerSum() {
+        playerSumShow = document.getElementById('playerSum').innerHTML = playerSum;
+
+        if (playerSum > 21) {
+            document.getElementById('playerSum').innerHTML = 'Перебор';
+        }
+    }
+
+    function drawPlayerCard() {
+        playerHand = document.getElementById('playerCards');
+        playerHand.innerHTML += suit + titleCard + '</div>';
+    }
+
+    function getDealerCard() {
+        checkSuit();
+        checkName();
+        drawDealerCard();
+        checkDealerSum();
+        drawDealerSum();
+        currentCard++;
+    }
+
+
+    function checkDealerSum() { //Проверка суммы руки дилдлера
+        console.log('Ход диллера-------------------------------');
+        dealerCards.push(deck[currentCard]);
+        console.log('Текущая карта', dealerCards[dCurrentCard]);
+
+
+        if (dealerCards[dCurrentCard].name == '1') {
+            acesD++;
+            console.log('Кол-во тузов D', acesD);
+            acesDcount = acesD;
+            console.log('Запас тузов D', acesDcount);
+        }
+
+        if (acesD > 1 && dealerCards[dCurrentCard].name == '1') {
+            dealerCards[dCurrentCard].cost = 1;
+            console.log('Туз = 1');
+        }
+
+        dealerSum = dealerSum + dealerCards[dCurrentCard].cost;
+        console.log('Сумма карт', dealerSum);
+
+
+
+        if (acesD >= 1 && dealerSum > 21 && acesDcount != 0) {
+            console.log('Перебор с тузом');
+            dealerSum = dealerSum - 10;
+            console.log('Отнимаем 10');
+            acesDcount--;
+            drawDealerSum();
+        }
+
+        dCurrentCard++;
+    }
+
+
+    function checkPlayerSum() { //Проверка суммы руки игрока
+        console.log('Ход игрока-------------------------------');
+        playerCards.push(deck[currentCard]);
+        console.log('Текущая карта', playerCards[pCurrentCard]);
+
+        if (playerCards[pCurrentCard].name == '1') {
+            acesP++;
+            console.log('Кол-во тузов P', acesP);
+            acesPcount = acesP;
+            console.log('Запас тузов P', acesPcount);
+        }
+
+        if (acesP > 1 && playerCards[pCurrentCard].name == '1') {
+            playerCards[pCurrentCard].cost = 1;
+            console.log('Туз = 1');
+        }
+
+        playerSum = playerSum + playerCards[pCurrentCard].cost;
+        console.log('Сумма карт', playerSum);
+
+        if (playerSum > 21) {
+            console.log('Просто перебор');
+        }
+
+        if (acesP = 1 && playerSum > 21 && acesPcount != 0) {
+            console.log('Перебор с тузом');
+            playerSum = playerSum - 10;
+            console.log('Отнимаем 10');
+            acesPcount--;
+            drawPlayerSum();
+        }
+
+        pCurrentCard++;
+
+    }
+
+
+    function getPlayerCard() {
+
+        if (document.getElementById('playerCards').children.length == 4) {
+            document.getElementById('moreBtn').setAttribute('disabled', "disabled");
+        }
+
+        checkSuit();
+        checkName();
+        drawPlayerCard();
+        checkPlayerSum(); //Вызываем проверку суммы руки
+
+        if (playerSum > 21) {
+            document.getElementById('showMsg').innerHTML = 'Диллер выйграл';
+            document.getElementById('statusBox').style.opacity = '1';
+        }
+
+        if (playerSum == 21) {
+            enough();
+        }
+
+        drawPlayerSum();
+        currentCard++;
+    }
+
+    function getStartHands() { //Небольшой костыль, но что поделать
+
+        for (let i = 0; i < 2; i++) {
+            getDealerCard();
+        }
+
+        for (let i = 0; i < 2; i++) {
+            getPlayerCard();
+        }
+
+        if (playerSum == 21) {
+            enough();
+        }
+    }
+
+    function checkWinner() {
+        if (playerSum > dealerSum && playerSum <= 21 || dealerSum > 21) {
+            document.getElementById('showMsg').innerHTML = 'Игрок победил';
+            document.getElementById('statusBox').style.opacity = '1';
+        }
+
+        if (dealerSum > playerSum && dealerSum <= 21 || playerSum > 21) {
+            document.getElementById('showMsg').innerHTML = 'Диллер победил';
+            document.getElementById('statusBox').style.opacity = '1';
+
+
+        }
+
+        if (dealerSum == playerSum) {
+            document.getElementById('showMsg').innerHTML = 'Ничья';
+            document.getElementById('statusBox').style.opacity = '1';
+        }
+
+        if (document.getElementById('dealerCards').children.length == 5) {
+            document.getElementById('enoughBtn').setAttribute('disabled', "disabled");
+        }
+    }
+
+
+    function enough() {
+
+        for (let i = 0; i < 3; i++) {
+            getDealerCard();
+            if (dealerSum > 17) {
+                break;
+            }
+        }
+
+        checkWinner();
+
+    }
+
+
+    shuffleDeck();
+    getStartHands();
+
+    function playAgain() {
+        deck = [];
+        playerCards = [];
+        dealerCards = [];
+        currentCard = 0;
+        dealerSum = 0;
+        playerSum = 0;
+        pCurrentCard = 0;
+        dCurrentCard = 0;
+        acesD = 0;
+        acesP = 0;
+        acesPcount = 0;
+        acesDcount = 0;
+        document.getElementById('playerSum').innerHTML = 0;
+        document.getElementById('playerCards').innerHTML = '';
+        document.getElementById('dealerSum').innerHTML = 0;
+        document.getElementById('dealerCards').innerHTML = '';
+        document.getElementById('statusBox').style.opacity = '0';
+        shuffleDeck();
+        getStartHands();
+    }
+
+</script>
